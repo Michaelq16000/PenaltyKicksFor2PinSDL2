@@ -277,18 +277,22 @@ bool ifWin()
 int main(int argc, char* args[])
 {
     SDL_Init(SDL_INIT_EVERYTHING);
-
+    SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
 
     SDL_Window* window = SDL_CreateWindow("RoboPenaltyKicks 2025 for 2 players Delux Premium (Collector's Edition)",
                                           SDL_WINDOWPOS_UNDEFINED,
                                           SDL_WINDOWPOS_UNDEFINED,
-                                          1280, 960,
+                                          960, 720,//1280, 960
                                           SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
 
     SDL_GLContext glcontext = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, glcontext);
+
+    if (SDL_GL_SetSwapInterval(1) < 0) {
+        std::cerr << "Warning: Unable to set VSync! SDL_Error: " << SDL_GetError() << std::endl;
+    }
 
     int loop = 1;
     SDL_Event event;
