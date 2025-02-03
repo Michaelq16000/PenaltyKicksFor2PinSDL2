@@ -19,9 +19,8 @@ using namespace std::chrono_literals;
 
 //used to determine if the kick's power is right, change to make it harder to shoot right
 //tooWeak must be in the range of 0-31 and tooStrong must be in the range of 33-64
-//32-tooWeak should be less than 64-tooStrong, it goes well with power bar's visuals
-//could
-const int tooWeak = 29, tooStrong = 40;
+
+const int tooWeak = 26, tooStrong = 38;
 // SpaceHeld = 0: start, 1: space pressed, 2: space let go
 //for directions: -1 means left, 1 means right
 int power = 0, spaceHeld = 0, gkDirection = 0, shootingDirection = 0, gkDirectionIntent = 0, shootingDirectionIntent = 0;
@@ -342,7 +341,7 @@ int main(int argc, char* args[])
                 break;
             }
         }
-        std::cout <<"gk " << gkScore << " sh " << shooterScore << std::endl;
+        std::cout <<"gk " << gkScore << " sh " << shooterScore << " power "<< power << std::endl;
         display();
         SDL_GL_SwapWindow(window);
         if(spaceHeld == 2)//on kick but after display
