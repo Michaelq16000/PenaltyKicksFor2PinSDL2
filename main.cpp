@@ -24,10 +24,10 @@ const int tooWeak = 26, tooStrong = 38;
 // SpaceHeld = 0: start, 1: space pressed, 2: space let go
 //for directions: -1 means left, 1 means right
 int power = 0, spaceHeld = 0, gkDirection = 0, shootingDirection = 0, gkDirectionIntent = 0, shootingDirectionIntent = 0;
-float gkScore = 0, shooterScore = 0, r,g,b;
+float gkScore = 0, shooterScore = 0, r,g = 0.6,b;
 void init()
 {
-    glClearColor(0.0, 0.6, 0.0, 1.0);
+    glClearColor(r, g, b, 1.0);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45,640.0/480.0,1.0,500.0);
@@ -208,11 +208,18 @@ void drawBall()
     }
 }
 
+bool ifWin()
+{
+    if(gkScore == 10 || shooterScore == 10) return true;
+    else return false;
+}
+
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     glClearColor(r, g, b, 1.0);
+    if(ifWin()) init();
     glTranslatef(0.0,0.0,-4.0);
     glColor3f(1.0, 1.0, 1.0);
 
@@ -232,7 +239,7 @@ void display()
     glPushMatrix();// RobotGK
     glTranslatef(0.0,0.0,-0.25);
     glScalef(0.6,0.6,0.6);
-    if(r >= 1) glColor3f(1.0, 0.9, 0.0);
+    if(ifWin() && gkScore == 10) glColor3f(1.0, 0.9, 0.0);
     else glColor3f(0.9,0.7,0.7);
     DrawRobot(false);
     glPopMatrix();
@@ -240,7 +247,7 @@ void display()
     glPushMatrix();// RobotShooter
     glTranslatef(-0.25,-0.5,1.1);
     glScalef(0.5,0.5,0.5);
-    if(b >= 1) glColor3f(1.0, 0.9, 0.0);
+    if(ifWin() && shooterScore == 10) glColor3f(1.0, 0.9, 0.0);
     else glColor3f(0.7,0.7,0.9);
     if(spaceHeld == 2) DrawRobot(true);
     else DrawRobot(false);
@@ -267,13 +274,6 @@ void display()
     glEnd();
 }
 
-bool ifWin()
-{
-    if(r == 1 || b == 1) return true;
-    if(gkScore == 10 || shooterScore == 10) return true;
-    else return false;
-}
-
 int main(int argc, char* args[])
 {
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -290,7 +290,8 @@ int main(int argc, char* args[])
     SDL_GLContext glcontext = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, glcontext);
 
-    if (SDL_GL_SetSwapInterval(1) < 0) {
+    if (SDL_GL_SetSwapInterval(1) < 0)
+    {
         std::cerr << "Warning: Unable to set VSync! SDL_Error: " << SDL_GetError() << std::endl;
     }
 
@@ -299,7 +300,27 @@ int main(int argc, char* args[])
     init();
     while (loop==1)
     {
-        r = (gkScore/5)-(shooterScore/10),g = 0.6-(0.6*((gkScore+shooterScore)/5)), b = (shooterScore/5)-(gkScore/10);
+        if (gkScore >= 10)
+        {
+            r = 1.0; // gk win
+            g = 0.0;
+            b = 0.0;
+            shooterScore = 0;
+        }
+        else if (shooterScore >= 10)
+        {
+            r = 0.0;
+            g = 0.0;
+            b = 1.0; // sh win
+            gkScore = 0;
+        }
+        else if (shooterScore < 10 && gkScore < 10)
+        {
+            r = (gkScore / 8.0) - (shooterScore / 20.0);
+            g = 0.6 - (0.6 * ((gkScore + shooterScore) / 10.0));
+            b = (shooterScore / 8.0) - (gkScore / 20.0);
+        }
+
         while (SDL_PollEvent(&event))
         {
             switch(event.type)
